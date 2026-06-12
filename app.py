@@ -1,5 +1,7 @@
 import streamlit as st
 import re
+import logging
+import os
 
 from src.logger_config import logger
 from src.agents_config import executar_fluxo_agentes
@@ -8,6 +10,18 @@ st.set_page_config(
     page_title="Multi-Agent Chatbot",
     page_icon="🤖",
     layout="centered"
+)
+
+if not os.path.exists("logs"):
+    os.makedirs("logs")
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.FileHandler("logs/app.log", encoding="utf-8"),
+        logging.StreamHandler()
+    ]
 )
 
 def validar_input_matematico(texto: str) -> tuple[bool, str]:
