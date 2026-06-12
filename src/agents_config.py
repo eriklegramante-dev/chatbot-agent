@@ -98,6 +98,5 @@ def executar_fluxo_agentes(pergunta_usuario: str, contexto_historico: str = "") 
         verbose=True
     )
     
-    # Inicia a execução do fluxo
     resultado_final = equipe.kickoff()
     return str(resultado_final)
