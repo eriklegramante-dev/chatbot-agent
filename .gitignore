@@ -1,0 +1,14 @@
+# Ambiente Virtual
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Configurações locais e Chaves de API
+.env
+.streamlit/config.toml
+.streamlit/secrets.toml
+
+# Outros
+.DS_Store
+.streamlit
