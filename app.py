@@ -1,9 +1,9 @@
 import streamlit as st
 import re
 
+from src.logger_config import logger
 from src.agents_config import executar_fluxo_agentes
 
-# 1. Configuração da página
 st.set_page_config(
     page_title="Multi-Agent Chatbot",
     page_icon="🤖",
@@ -12,23 +12,19 @@ st.set_page_config(
 
 def validar_input_matematico(texto: str) -> tuple[bool, str]:
     """
-    Valida se o input do usuário contém tentativas inválidas de mistura
-    de texto com operações matemáticas (ex: '5 + batata').
+    Valida se o input tenta misturar texto inválido como argumento de uma operação.
+    Bloqueia apenas padrões bizarros como '5 + batata' ou '10 / texto'.
+    Frases naturais como 'Poderia somar 5 + 5' passam livremente.
     """
     texto_lower = texto.lower()
-    operadores = ['+', '-', '*', '/', 'somar', 'subtrair', 'multiplicar', 'dividir', 'mais', 'menos']
-    tentando_calcular = any(op in texto_lower for op in operadores) or any(char in texto for char in ['+', '-', '*', '/'])
     
-    if tentando_calcular:
-        palavras_permitidas = {
-            'quanto', 'é', 'o', 'resultado', 'de', 'por', 'e', 'qual', 'conta', 
-            'soma', 'subtração', 'multiplicação', 'divisão', 'da', 'do', 'com', 'agora'
-        }
-        palavras_no_texto = re.findall(r'[a-záéíóúçãõâêô]+', texto_lower)
-        for palavra in palavras_no_texto:
-            if palavra not in palavras_permitidas:
-                if any(char.isdigit() for char in texto):
-                    return False, f"Detectei um termo inválido para cálculos: **'{palavra}'**. Por favor, insira apenas números e operadores válidos."
+    padrao_mistura = r'([\+\-\*/]|\b(mais|menos|vezes|dividido)\b)\s*[a-zA-Záéíóúçãõâêô]+'
+    
+    if re.search(padrao_mistura, texto_lower):
+        palavras_suspeitas = re.findall(r'[\+\-\*/\b(mais|menos|vezes|dividido)\b]\s*([a-zA-Záéíóúçãõâêô]+)', texto_lower)
+        termo = palavras_suspeitas[0] if palavras_suspeitas else "texto"
+        return False, f"Detectei um termo inválido misturado ao cálculo: **'{termo}'**. Por favor, use apenas números com os operadores (ex: 'Poderia somar 10000 + 10000')."
+        
     return True, ""
 
 if "messages" not in st.session_state:
@@ -44,9 +40,8 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.write(message["content"])
 
-# 5. Campo de Entrada do Usuário
 if user_input := st.chat_input("Digite sua mensagem aqui..."):
-    
+    logger.info(f"Input do Usuário: '{user_input}'")
     valido, mensagem_erro = validar_input_matematico(user_input)
     
     if not valido:
@@ -70,7 +65,9 @@ if user_input := st.chat_input("Digite sua mensagem aqui..."):
                         pergunta_usuario=user_input, 
                         contexto_historico=historico_formatado
                     )
+                    logger.info(f"Resposta dos Agentes enviada com sucesso.")
                 except Exception as e:
+                    logger.error(f"Erro ao processar a requisição: {str(e)}", exc_info=True)
                     resposta_agentes = f"Desculpe, ocorreu um erro ao acionar os agentes: {str(e)}"
                 
                 st.write(resposta_agentes)

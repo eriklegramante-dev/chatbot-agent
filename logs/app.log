@@ -1,0 +1,23 @@
+2026-06-12 13:16:14,526 [INFO] Input do Usuário: 'Poderia fazer uma soma de 10000000 + 100000000'
+2026-06-12 13:18:20,558 [INFO] Input do Usuário: 'Quanto é 7281637812 + 1892763'
+2026-06-12 13:18:20,582 [INFO] 
+LiteLLM completion() model= llama-3.3-70b-versatile; provider = groq
+2026-06-12 13:18:20,962 [INFO] Wrapper: Completed Call, calling success_handler
+2026-06-12 13:18:20,963 [INFO] 
+LiteLLM completion() model= llama-3.3-70b-versatile; provider = groq
+2026-06-12 13:18:21,343 [INFO] Wrapper: Completed Call, calling success_handler
+2026-06-12 13:18:21,357 [INFO] 
+LiteLLM completion() model= llama-3.3-70b-versatile; provider = groq
+2026-06-12 13:18:21,952 [INFO] Wrapper: Completed Call, calling success_handler
+2026-06-12 13:18:21,962 [INFO] Resposta dos Agentes enviada com sucesso.
+2026-06-12 13:29:22,503 [INFO] Input do Usuário: 'poderia somar 5 + 4?'
+2026-06-12 13:29:22,546 [INFO] 
+LiteLLM completion() model= llama-3.3-70b-versatile; provider = groq
+2026-06-12 13:29:22,900 [INFO] Wrapper: Completed Call, calling success_handler
+2026-06-12 13:29:22,902 [INFO] 
+LiteLLM completion() model= llama-3.3-70b-versatile; provider = groq
+2026-06-12 13:29:23,235 [INFO] Wrapper: Completed Call, calling success_handler
+2026-06-12 13:29:23,248 [INFO] 
+LiteLLM completion() model= llama-3.3-70b-versatile; provider = groq
+2026-06-12 13:29:23,840 [INFO] Wrapper: Completed Call, calling success_handler
+2026-06-12 13:29:23,850 [INFO] Resposta dos Agentes enviada com sucesso.
