@@ -12,3 +12,4 @@ __pycache__/
 # Outros
 .DS_Store
 .streamlit
+/logs
