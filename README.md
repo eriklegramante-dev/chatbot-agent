@@ -1,38 +1,38 @@
-# 🤖 Chatbot Multi-Agente de Orquestração Sequencial
+# 🤖 Multi-Agent Sequential Orchestration Chatbot
 
-Este projeto consiste em um **Chatbot inteligente e resiliente** desenvolvido com **Streamlit** e **CrewAI**. A aplicação demonstra a orquestração estruturada de múltiplos agentes de IA especializados, o uso de ferramentas Python como fonte única da verdade e a aplicação rigorosa de memória contextual, guardrails e testes automatizados.
-
----
-
-## 🎯 Objetivo
-
-Resolver o problema clássico de alucinação de modelos de linguagem em operações matemáticas, garantindo que todos os cálculos sejam executados por ferramentas determinísticas e não pelo LLM.
+This project is an **intelligent and resilient chatbot** built with **Streamlit** and **CrewAI**. The application demonstrates structured orchestration of multiple specialized AI agents, the use of Python tools as the single source of truth, and the implementation of contextual memory, guardrails, and automated testing.
 
 ---
 
-## ✨ Funcionalidades
+## 🎯 Objective
 
-- Operações matemáticas exatas (soma, subtração, multiplicação e divisão)
-- Arquitetura multiagente com CrewAI
-- Memória contextual de curto prazo
-- Guardrails de entrada via Regex
-- Validações robustas com tratamento de exceções
-- Logs estruturados para auditoria
-- Testes automatizados com Pytest
-- Interface web utilizando Streamlit
+Solve the classic problem of language model hallucinations in mathematical operations by ensuring that all calculations are executed through deterministic tools rather than the LLM itself.
 
 ---
 
-## 🏗️ Arquitetura
+## ✨ Features
+
+- Exact mathematical operations (addition, subtraction, multiplication, and division)
+- Multi-agent architecture powered by CrewAI
+- Short-term contextual memory
+- Input guardrails using Regex validation
+- Robust exception handling and validation
+- Structured logging for auditing and debugging
+- Automated testing with Pytest
+- Web interface built with Streamlit
+
+---
+
+## 🏗️ Architecture
 
 ```mermaid
 flowchart TD
-    U[Usuário]
-    S[Interface Streamlit]
-    C[Orquestrador CrewAI]
-    M[Agente Matemático]
-    T[Tools Matemáticas]
-    W[Agente Escritor]
+    U[User]
+    S[Streamlit Interface]
+    C[CrewAI Orchestrator]
+    M[Math Agent]
+    T[Math Tools]
+    W[Writer Agent]
 
     U --> S
     S --> C
@@ -41,19 +41,19 @@ flowchart TD
     T --> W
 ```
 
-### Fluxo
+### Workflow
 
-1. O usuário envia uma solicitação.
-2. O Streamlit realiza validações iniciais.
-3. O CrewAI coordena os agentes.
-4. O Agente Matemático identifica a operação necessária.
-5. As Tools executam o cálculo real.
-6. O Agente Escritor converte o resultado em uma resposta amigável.
-7. O resultado é devolvido ao usuário.
+1. The user submits a request.
+2. Streamlit performs initial validation.
+3. CrewAI orchestrates the agents.
+4. The Math Agent identifies the required operation.
+5. Mathematical Tools execute the actual calculation.
+6. The Writer Agent converts the result into a user-friendly response.
+7. The response is returned to the user.
 
 ---
 
-## 📁 Estrutura do Projeto
+## 📁 Project Structure
 
 ```text
 chat-bot-task/
@@ -71,76 +71,76 @@ chat-bot-task/
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## 🛠️ Technologies Used
 
-| Tecnologia | Finalidade |
-|------------|------------|
-| Python 3.12 | Linguagem principal |
-| Streamlit | Interface Web |
-| CrewAI | Orquestração multiagente |
-| Groq | Inferência LLM |
-| Llama 3.3 70B | Modelo de linguagem |
-| Pytest | Testes automatizados |
+| Technology | Purpose |
+|------------|----------|
+| Python 3.12 | Main programming language |
+| Streamlit | Web interface |
+| CrewAI | Multi-agent orchestration |
+| Groq | LLM inference |
+| Llama 3.3 70B | Language model |
+| Pytest | Automated testing |
 
 ---
 
-## 🧠 Memória Contextual
+## 🧠 Contextual Memory
 
-O histórico da conversa é armazenado através do `st.session_state.messages`.
+Conversation history is stored using `st.session_state.messages`.
 
-Exemplo:
+Example:
 
 ```python
 historico_formatado = ""
 
 for msg in st.session_state.messages[:-1]:
-    autor = "Usuário" if msg["role"] == "user" else "Assistente"
-    historico_formatado += f"{autor}: {msg['content']}\n"
+    author = "User" if msg["role"] == "user" else "Assistant"
+    historico_formatado += f"{author}: {msg['content']}\n"
 ```
 
-Isso permite interações encadeadas como:
+This enables follow-up interactions such as:
 
 ```text
-Usuário: Quanto é 5 + 4?
-Assistente: 9
+User: What is 5 + 4?
+Assistant: 9
 
-Usuário: Agora multiplique por 2
-Assistente: 18
+User: Now multiply it by 2
+Assistant: 18
 ```
 
 ---
 
 ## 🔒 Guardrails
 
-### Front-end
+### Front-End
 
-Validação por expressões regulares para impedir entradas inválidas.
+Regex validation prevents invalid inputs.
 
-Exemplo:
+Example:
 
 ```text
-5 + batata
+5 + potato
 ```
 
-### Back-end
+### Back-End
 
-- Conversão explícita de tipos
-- Tratamento de exceções
-- Restrições de prompt
-- Rejeição de operações sem dados numéricos válidos
+- Explicit type conversion
+- Exception handling
+- Prompt restrictions
+- Rejection of operations without valid numeric inputs
 
 ---
 
-## 🚀 Instalação
+## 🚀 Installation
 
-### 1. Clonar o projeto
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/eriklegramante-dev/chat-bot-task.git
 cd chat-bot-task
 ```
 
-### 2. Criar ambiente virtual
+### 2. Create a Virtual Environment
 
 #### Linux/macOS
 
@@ -156,27 +156,27 @@ python -m venv venv
 venv\Scripts\activate
 ```
 
-### 3. Instalar dependências
+### 3. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Configurar variáveis de ambiente
+### 4. Configure Environment Variables
 
-Crie um arquivo `.env`:
+Create a `.env` file:
 
 ```env
-GROQ_API_KEY=sua_chave_aqui
+GROQ_API_KEY=your_api_key_here
 ```
 
-### 5. Executar aplicação
+### 5. Run the Application
 
 ```bash
 streamlit run app.py
 ```
 
-A aplicação ficará disponível em:
+The application will be available at:
 
 ```text
 http://localhost:8501
@@ -184,15 +184,15 @@ http://localhost:8501
 
 ---
 
-## 🧪 Testes
+## 🧪 Testing
 
-Executar:
+Run:
 
 ```bash
 pytest tests/test_tools.py
 ```
 
-Saída esperada:
+Expected output:
 
 ```text
 collected 5 items
@@ -204,19 +204,30 @@ tests/test_tools.py ..... [100%]
 
 ---
 
-## 📊 Critérios de Aceitação
+## 📊 Acceptance Criteria
 
-- [x] Chatbot funcional via Streamlit
-- [x] Operações matemáticas exatas
-- [x] Uso exclusivo de Tools para cálculos
-- [x] Orquestração multiagente com CrewAI
-- [x] Memória contextual funcional
-- [x] Guardrails implementados
-- [x] Logs estruturados
-- [x] Testes automatizados
+- [x] Chatbot runs successfully with Streamlit
+- [x] Exact mathematical operations
+- [x] Calculations performed exclusively through Tools
+- [x] Multi-agent orchestration with CrewAI
+- [x] Functional contextual memory
+- [x] Guardrails implemented
+- [x] Structured logging
+- [x] Automated testing
 
 ---
 
-## 📄 Licença
+## 🚀 Roadmap
 
-Este projeto está licenciado sob a licença MIT.
+- [ ] Database persistence
+- [ ] Docker support
+- [ ] Long-term memory
+- [ ] RAG integration
+- [ ] Langfuse observability
+- [ ] Additional tool integrations
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.
