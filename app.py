@@ -55,7 +55,7 @@ for message in st.session_state.messages:
         st.write(message["content"])
 
 if user_input := st.chat_input("Digite sua mensagem aqui..."):
-    logger.info(f"Input do Usuário: '{user_input}'")
+    
     valido, mensagem_erro = validar_input_matematico(user_input)
     
     if not valido:
@@ -68,9 +68,8 @@ if user_input := st.chat_input("Digite sua mensagem aqui..."):
         with st.chat_message("assistant"):
             with st.spinner("Os agentes estão colaborando na resposta..."):
                 
-
                 historico_formatado = ""
-                for msg in st.session_state.messages[:-1]: # Ignora a última mensagem que acabou de ser enviada
+                for msg in st.session_state.messages[:-1]:
                     autor = "Usuário" if msg["role"] == "user" else "Assistente"
                     historico_formatado += f"{autor}: {msg['content']}\n"
                 
@@ -79,10 +78,38 @@ if user_input := st.chat_input("Digite sua mensagem aqui..."):
                         pergunta_usuario=user_input, 
                         contexto_historico=historico_formatado
                     )
-                    logger.info(f"Resposta dos Agentes enviada com sucesso.")
+                    
                 except Exception as e:
-                    logger.error(f"Erro ao processar a requisição: {str(e)}", exc_info=True)
-                    resposta_agentes = f"Desculpe, ocorreu um erro ao acionar os agentes: {str(e)}"
+                    erro_str = str(e).lower()
+                    
+                    if "rate_limit" in erro_str or "limit_exceeded" in erro_str or "quota" in erro_str:
+                        resposta_agentes = (
+                            "⚠️ **Ufa, quanta energia!** Nosso motor de IA atingiu o limite temporário de mensagens da conta gratuita. "
+                            "Por favor, **aguarde cerca de 1 minuto** para o sistema respirar e envie sua mensagem novamente. "
+                            "Seu histórico de conversa não foi perdido!"
+                        )
+                        logger.warning(f"Rate Limit atingido na API: {str(e)}")
+                        
+                    elif "api_key" in erro_str or "authentication" in erro_str:
+                        resposta_agentes = (
+                            "🔧 **Erro de Configuração:** Houve um problema de autenticação com o provedor de IA. "
+                            "Por favor, verifique se a chave de API nas configurações do servidor está correta."
+                        )
+                        logger.error(f"Erro de autenticação de API: {str(e)}")
+                        
+                    elif "timeout" in erro_str or "deadline" in erro_str:
+                        resposta_agentes = (
+                            "⏳ **Tempo limite esgotado:** O servidor de IA demorou um pouco mais do que o esperado para responder. "
+                            "Pode tentar enviar o comando novamente?"
+                        )
+                        logger.warning(f"Timeout na requisição de IA: {str(e)}")
+                        
+                    else:
+                        resposta_agentes = (
+                            "🤖 **Ih, deu um pequeno curto-circuito!** Eu não consegui processar essa resposta agora. "
+                            "Isso pode ser uma instabilidade temporária no servidor do modelo. Pode tentar de novo?"
+                        )
+                        logger.error(f"Erro inesperado no fluxo de agentes: {str(e)}", exc_info=True)
                 
                 st.write(resposta_agentes)
                 
