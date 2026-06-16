@@ -55,37 +55,39 @@ escritor_agent = Agent(
 
 def executar_fluxo_agentes(pergunta_usuario: str, contexto_historico: str = "") -> str:
     """
-    Executa a equipe com restrições severas de tamanho, escopo e idioma.
+    Executa a equipe permitindo interpretação de texto matemático, saudações
+    e respostas amigáveis de forma ultra-concisa.
     """
     
     tarefa_calculo = Task(
         description=(
             f"Histórico das conversas anteriores:\n{contexto_historico}\n"
             f"Comando atual do usuário: '{pergunta_usuario}'.\n\n"
-            "INSTRUÇÕES DE ESCOPO MATEMÁTICO:\n"
-            "1. Se o comando atual pedir uma nova operação sobre o número anterior (ex: 'subtraia por 2'), "
-            "identifique o último resultado no histórico e execute o cálculo usando a ferramenta.\n"
-            "2. Se o comando atual for uma pergunta completamente fora de matemática (ex: história, pessoas, curiosidades), "
-            "NÃO use nenhuma ferramenta e salve internamente a mensagem: 'FORA_DE_ESCOPO'.\n"
-            "3. Se o comando atual for um cálculo direto novo, apenas calcule usando a ferramenta."
+            "DIRETRIZES DE RACIOCÍNIO:\n"
+            "1. Se o usuário estiver apenas saudando (ex: 'Olá', 'Oi'), responda internamente: 'SAUDACAO'.\n"
+            "2. Se o usuário trouxer um problema matemático em formato de texto ou enigma (ex: 'If John is twice as old...'), "
+            "interprete a lógica, extraia os números e use as ferramentas necessárias para calcular o resultado.\n"
+            "3. Se o comando pedir uma nova operação continuada (ex: 'subtraia por 2'), combine o comando com o último número do histórico.\n"
+            "4. Se o assunto for 100% fora de matemática ou lógica (ex: pedir poemas, falar sobre futebol, receitas), salve internamente: 'FORA_DE_ESCOPO'."
         ),
-        expected_output="O número bruto do resultado OU a palavra exata 'FORA_DE_ESCOPO'.",
+        expected_output="O número bruto calculado, a palavra 'SAUDACAO' ou a palavra 'FORA_DE_ESCOPO'.",
         agent=matematico_agent
     )
     
     tarefa_escrita = Task(
         description=(
             f"Texto original enviado pelo usuário: '{pergunta_usuario}'.\n\n"
-            "REGRAS CRUTIAIS DE FORMATAÇÃO (MÁXIMO 100 CARACTERES):\n"
-            "1. IDIOMA: Identifique o idioma do texto original do usuário e responda EXATAMENTE nesse mesmo idioma.\n"
-            "2. SE FORA DE ESCOPO: Se a tarefa anterior retornou 'FORA_DE_ESCOPO', responda apenas: "
-            "'Erro: Esta aplicação processa apenas comandos matemáticos.' (traduzido para o idioma do usuário).\n"
-            "3. SE FOR CÁLCULO: Seja o mais direto possível. Retorne apenas o número ou uma frase curtíssima.\n"
-            "Exemplo em português: 'O resultado é 2.' ou apenas '2'.\n"
-            "Exemplo em japonês: '2 です。'\n"
-            "4. PROIBIÇÃO: É terminantemente proibido saudações longas como 'Olá! Estou aqui para ajudar'."
+            "REGRAS DE FORMATAÇÃO E IDIOMA (MÁXIMO 100 CARACTERES):\n"
+            "1. IDIOMA: Responda estritamente NO MESMO IDIOMA em que o usuário escreveu a pergunta atual.\n"
+            "2. CASO SEJA SAUDAÇÃO: Dê uma resposta curta e muito amigável convidando para um cálculo. "
+            "(Ex em PT: 'Olá! Sou seu assistente matemático. O que vamos calcular hoje?')\n"
+            "3. CASO SEJA CÁLCULO: Traga o resultado de forma leve, amigável e ultra-direta. "
+            "(Ex em PT: 'O resultado é 10!' ou 'Com certeza, isso dá 6.'). Evite parágrafos longos.\n"
+            "4. CASO FORA DE ESCOPO: Explique educadamente que o foco do sistema é apenas matemática. "
+            "(Ex em ES: 'Erro: Esta aplicación processa solo comandos matemáticos.').\n"
+            "5. RESTRIÇÃO: A sua resposta final combinada NUNCA pode passar de 100 caracteres."
         ),
-        expected_output="Uma resposta final contendo no máximo 100 caracteres, escrita no mesmo idioma do usuário.",
+        expected_output="Uma frase amigável, natural e curtíssima no mesmo idioma do usuário (Máx 100 caracteres).",
         agent=escritor_agent
     )
     
