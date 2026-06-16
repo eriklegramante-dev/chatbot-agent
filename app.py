@@ -112,11 +112,11 @@ if user_input := st.chat_input("Digite sua mensagem aqui..."):
         st.error(mensagem_erro)
     else:
         if len(st.session_state.messages) == 0:
+            st.session_state.messages.append({"role": "user", "content": user_input})
+
             st.rerun()
             
-        with st.chat_message("user"):
-            st.write(user_input)
-        st.session_state.messages.append({"role": "user", "content": user_input})
+    if len(st.session_state.messages) > 0 and st.session_state.messages[-1]["role"] == "user":
         
         with st.chat_message("assistant"):
             with st.spinner("Os agentes estão colaborando na resposta..."):
