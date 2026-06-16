@@ -131,11 +131,11 @@ if len(st.session_state.messages) > 0 and st.session_state.messages[-1]["role"] 
                 historico_formatado += f"{autor}: {msg['content']}\n"
             
             try:
-                # Chamada segura passando o texto que veio da memória da sessão
-                resposta_agentes = executar_fluxo_agentes(
+                retorno_crew = executar_fluxo_agentes(
                     pergunta_usuario=comando_real, 
                     contexto_historico=historico_formatado
                 )
+                resposta_agentes = str(retorno_crew)
                 
             except Exception as e:
                 erro_str = str(e).lower()
@@ -162,4 +162,6 @@ if len(st.session_state.messages) > 0 and st.session_state.messages[-1]["role"] 
             st.write(resposta_agentes)
             
     st.session_state.messages.append({"role": "assistant", "content": resposta_agentes})
-    st.rerun()
+    
+    if "curto-circuito" not in resposta_agentes:
+        st.rerun()
