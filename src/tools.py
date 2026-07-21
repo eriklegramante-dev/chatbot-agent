@@ -1,52 +1,58 @@
 """
-Módulo de Ferramentas (Tools) Matemáticas com Guardrails.
-Contém as operações básicas protegidas contra argumentos inválidos (textos).
+Mathematical Tools Module with Guardrails.
+Contains basic operations protected against invalid arguments (text).
 """
 
-def somar(a: float, b: float) -> float or str:
+from typing import Union
+
+
+def add(a: float, b: float) -> Union[float, str]:
     """
-    Soma dois números reais (a e b) e retorna o resultado.
-    Regra: Ambos os argumentos devem ser números estritos.
-    Use esta ferramenta quando o usuário pedir adição ou soma.
+    Adds two real numbers (a and b) and returns the result.
+    Rule: Both arguments must be strict numbers.
+    Use this tool when the user requests addition or sum.
     """
     try:
         return float(float(a) + float(b))
     except (ValueError, TypeError):
-        return "Erro: Argumentos inválidos. Esta ferramenta aceita apenas números reais, não textos."
+        return "Error: Invalid arguments. This tool accepts only real numbers, not text."
 
-def subtrair(a: float, b: float) -> float or str:
+
+def subtract(a: float, b: float) -> Union[float, str]:
     """
-    Subtrai o segundo número (b) do primeiro número (a) e retorna o resultado.
-    Regra: Ambos os argumentos devem ser números estritos.
-    Use esta ferramenta quando o usuário pedir subtração ou diferença.
+    Subtracts the second number (b) from the first number (a) and returns the result.
+    Rule: Both arguments must be strict numbers.
+    Use this tool when the user requests subtraction or difference.
     """
     try:
         return float(float(a) - float(b))
     except (ValueError, TypeError):
-        return "Erro: Argumentos inválidos. Esta ferramenta aceita apenas números reais, não textos."
+        return "Error: Invalid arguments. This tool accepts only real numbers, not text."
 
-def multiplicar(a: float, b: float) -> float or str:
+
+def multiply(a: float, b: float) -> Union[float, str]:
     """
-    Multiplica dois números reais (a e b) e retorna o resultado.
-    Regra: Ambos os argumentos devem ser números estritos.
-    Use esta ferramenta quando o usuário pedir multiplicação ou produto.
+    Multiplies two real numbers (a and b) and returns the result.
+    Rule: Both arguments must be strict numbers.
+    Use this tool when the user requests multiplication or product.
     """
     try:
         return float(float(a) * float(b))
     except (ValueError, TypeError):
-        return "Erro: Argumentos inválidos. Esta ferramenta aceita apenas números reais, não textos."
+        return "Error: Invalid arguments. This tool accepts only real numbers, not text."
 
-def dividir(a: float, b: float) -> float or str:
+
+def divide(a: float, b: float) -> Union[float, str]:
     """
-    Divide o primeiro número (a) pelo segundo número (b) e retorna o resultado.
-    Regras: Ambos os argumentos devem ser números estritos e 'b' não pode ser zero.
-    Use esta ferramenta quando o usuário pedir divisão ou quociente.
+    Divides the first number (a) by the second number (b) and returns the result.
+    Rules: Both arguments must be strict numbers and 'b' cannot be zero.
+    Use this tool when the user requests division or quotient.
     """
     try:
         num_a = float(a)
         num_b = float(b)
         if num_b == 0:
-            return "Erro: Divisão por zero não é permitida."
+            return "Error: Division by zero is not allowed."
         return float(num_a / num_b)
     except (ValueError, TypeError):
-        return "Erro: Argumentos inválidos. Esta ferramenta aceita apenas números reais, não textos."
+        return "Error: Invalid arguments. This tool accepts only real numbers, not text."
