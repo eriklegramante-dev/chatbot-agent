@@ -54,7 +54,6 @@ class ChatbotOrchestrator:
                 user_message=user_message, chat_history=chat_history_str
             )
 
-            # Passa calc_result como o primeiro argumento posicional (raw_input)
             final_response = run_writer(
                 raw_input=calc_result, user_message=user_message
             )
