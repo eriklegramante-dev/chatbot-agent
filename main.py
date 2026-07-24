@@ -1,13 +1,23 @@
+import os
+import sys
+import asyncio
 import uvicorn
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
-from src.agents_config import execute_agent_flow
-from src.schemas import ChatRequest, ChatResponse
+
+from src.agents.mathematician import run_mathematician
+from src.agents.writer import run_writer
+from src.utils.validation import is_invalid_mixed_prompt
+from src.schemas.schemas import ChatRequest, ChatResponse
 
 load_dotenv()
 
-app = FastAPI(title="Math Agent Chatbot API")
+app = FastAPI(
+    title="Math Agent Chatbot API",
+    description="API for processing mathematical operations using isolated CrewAI agents.",
+    version="2.0.0",
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -17,6 +27,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.get("/health")
 async def health_check():
     """Health check endpoint to verify API availability."""
@@ -25,27 +36,39 @@ async def health_check():
 
 @app.post("/api/chat", response_model=ChatResponse)
 async def chat_endpoint(payload: ChatRequest):
-    try:
-        user_message = payload.message
-        chat_history = payload.history or ""
+    """
+    Orchestrates the modular flow:
+    1. Validation Guardrail (Fast-Fail)
+    2. Mathematician Agent (Calculation / Intent)
+    3. Copywriter Agent (Response Formatting)
+    """
+    user_prompt = payload.message.strip()
 
-        ai_response = await execute_agent_flow(
-            user_prompt=user_message,
-            chat_history=chat_history
+    if is_invalid_mixed_prompt(user_prompt):
+        return ChatResponse(
+            response="Invalid expression. Please provide valid numbers and mathematical operators."
         )
 
-        return ChatResponse(response=ai_response)
+    chat_history = payload.chat_history or ""
+
+    try:
+        calc_result = await asyncio.to_thread(
+            run_mathematician, user_prompt, chat_history
+        )
+
+        final_response = await asyncio.to_thread(run_writer, user_prompt, calc_result)
+
+        return ChatResponse(response=final_response)
 
     except Exception as e:
-        print("\n--- DETAILED ERROR TRACEBACK ---")
         import traceback
-        traceback.print_exc() 
-        print("--------------------------------\n")
-        
-        raise HTTPException(
-            status_code=500,
-            detail=f"An error occurred while processing the agents: {str(e)}"
-        )
+
+        print("=== ERRO CAPTURADO NO BACKEND ===")
+        traceback.print_exc()
+        print("=================================")
+
+        return ChatResponse(response=f"BACKEND ERROR: {str(e)}")
+
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
