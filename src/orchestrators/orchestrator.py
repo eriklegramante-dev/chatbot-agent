@@ -51,11 +51,12 @@ class ChatbotOrchestrator:
 
         try:
             calc_result = run_mathematician(
-                user_prompt=user_message, chat_history=chat_history_str
+                user_message=user_message, chat_history=chat_history_str
             )
 
+            # Passa calc_result como o primeiro argumento posicional (raw_input)
             final_response = run_writer(
-                user_prompt=user_message, calc_result=calc_result
+                raw_input=calc_result, user_message=user_message
             )
 
         except Exception as err:

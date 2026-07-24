@@ -1,7 +1,9 @@
-fastapi
-uvicorn
-pydantic
-python-dotenv
-crewai
-litellm
-pytest
+fastapi>=0.110.0
+uvicorn>=0.28.0
+pydantic>=2.6.0
+python-dotenv>=1.0.0
+crewai>=0.28.0
+litellm>=1.0.0
+pytest>=8.0.0
+requests>=2.31.0
+langchain-groq>=0.1.0

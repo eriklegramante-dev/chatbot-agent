@@ -27,9 +27,7 @@ class MemoryManager:
         :param message: Raw text message content.
         """
         self._ensure_session_exists(session_id)
-        self._sessions[session_id].append(
-            {"role": "user", "content": message.strip()}
-        )
+        self._sessions[session_id].append({"role": "user", "content": message.strip()})
         self._trim_history(session_id)
 
     def add_assistant_message(self, session_id: str, message: str) -> None:
@@ -85,6 +83,4 @@ class MemoryManager:
         """
         max_messages = self.max_history_turns * 2
         if len(self._sessions[session_id]) > max_messages:
-            self._sessions[session_id] = self._sessions[session_id][
-                -max_messages:
-            ]
+            self._sessions[session_id] = self._sessions[session_id][-max_messages:]

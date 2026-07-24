@@ -1,54 +1,66 @@
 """
-Writer agent module for formatting responses to users.
+Writer Agent Module.
+
+This module defines the Writer Agent using CrewAI, responsible for transforming
+raw calculation outputs into natural, friendly Portuguese user responses.
 """
 
 import os
+from typing import Optional
 from dotenv import load_dotenv
-from crewai import LLM, Agent, Crew, Task
+from crewai import Agent, Task, Crew, LLM
 
 load_dotenv()
 
-groq_api_key = os.getenv("GROQ_API_KEY")
 
-llm_config = LLM(
-    model="openai/llama-3.1-8b-instant",
-    api_key=groq_api_key,
-    base_url="https://api.groq.com/openai/v1",
-    temperature=0.3,
-    max_tokens=150,  
-)
-
-
-def run_writer(user_prompt: str, calc_result: str) -> str:
+def run_writer(raw_input: str, user_message: Optional[str] = "", *args, **kwargs) -> str:
     """
-    Formats raw numerical outputs or keywords into natural, short sentences.
+    Executes the Writer Agent to format raw calculation output into natural language.
 
-    :param user_prompt: Original prompt from the user.
-    :param calc_result: The raw numerical or status string to incorporate.
-    :return: Formatted response string.
+    Args:
+        raw_input (str): The raw mathematical result or computation output.
+        user_message (Optional[str], optional): The original context or query from the user. Defaults to "".
+        *args: Additional positional arguments for flexibility across caller implementations.
+        **kwargs: Additional keyword arguments for flexibility across caller implementations.
+
+    Returns:
+        str: The formatted natural language response in Portuguese, or the raw input on failure.
     """
-    writer = Agent(
-        role="Response Formatter",
-        goal="Format raw numerical answers into concise, friendly responses in Portuguese.",
-        backstory="You are a helpful assistant that communicates math results clearly and briefly.",
-        allow_delegation=False,
-        llm=llm_config,
-        verbose=False,
-    )
+    try:
+        llm: LLM = LLM(
+            model="groq/llama-3.3-70b-versatile",
+            api_key=os.getenv("GROQ_API_KEY"),
+            temperature=0.7,
+        )
 
-    task = Task(
-        description=(
-            f"User Prompt: '{user_prompt}'\n"
-            f"Calculation Result: '{calc_result}'\n\n"
-            "INSTRUCTIONS:\n"
-            "1. Format the calculation result into a friendly, short sentence in Portuguese.\n"
-            "2. Keep the response under 100 characters.\n"
-            "3. Example: 'O resultado da sua conta é 9.'"
-        ),
-        expected_output="A concise formatted sentence in Portuguese presenting the result.",
-        agent=writer,
-    )
+        writer_agent: Agent = Agent(
+            role="Writer",
+            goal="Format mathematical responses into natural Portuguese text.",
+            backstory="You are a friendly assistant skilled at presenting numbers clearly and concisely.",
+            llm=llm,
+            verbose=False,
+        )
 
-    crew = Crew(agents=[writer], tasks=[task], cache=False, verbose=False)
-    result = crew.kickoff()
-    return str(result.raw if hasattr(result, "raw") else result).strip()
+        task_description: str = (
+            f"Format the following raw mathematical result into a clear, natural response in Portuguese: '{raw_input}'."
+        )
+        if user_message:
+            task_description += f" Original user message context: '{user_message}'."
+
+        formatting_task: Task = Task(
+            description=task_description,
+            expected_output="A polite, natural sentence containing the final numerical answer.",
+            agent=writer_agent,
+        )
+
+        crew: Crew = Crew(
+            agents=[writer_agent],
+            tasks=[formatting_task],
+            verbose=False,
+        )
+
+        result = crew.kickoff()
+        return result.raw if hasattr(result, "raw") else str(result)
+
+    except Exception:
+        return raw_input
