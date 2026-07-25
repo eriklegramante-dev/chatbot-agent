@@ -1,5 +1,3 @@
-import os
-import sys
 import asyncio
 import uvicorn
 from fastapi import FastAPI
@@ -21,7 +19,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -49,7 +47,7 @@ async def chat_endpoint(payload: ChatRequest):
             response="Invalid expression. Please provide valid numbers and mathematical operators."
         )
 
-    chat_history = payload.chat_history or ""
+    chat_history = getattr(payload, "chat_history", "") or ""
 
     try:
         calc_result = await asyncio.to_thread(
@@ -63,7 +61,7 @@ async def chat_endpoint(payload: ChatRequest):
     except Exception as e:
         import traceback
 
-        print("=== ERRO CAPTURADO NO BACKEND ===")
+        print("=== Error caught in the backend. ===")
         traceback.print_exc()
         print("=================================")
 

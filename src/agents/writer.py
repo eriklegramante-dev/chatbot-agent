@@ -4,63 +4,51 @@ Writer Agent Module.
 This module defines the Writer Agent using CrewAI, responsible for transforming
 raw calculation outputs into natural, friendly Portuguese user responses.
 """
-
-import os
-from typing import Optional
+import os 
 from dotenv import load_dotenv
-from crewai import Agent, Task, Crew, LLM
+from crewai import Agent, Crew, Process, Task
+from crewai import Agent, Task, Crew, Process, LLM
 
 load_dotenv()
 
 
-def run_writer(raw_input: str, user_message: Optional[str] = "", *args, **kwargs) -> str:
-    """
-    Executes the Writer Agent to format raw calculation output into natural language.
+free_llm = LLM(
+    model="gemini/gemini-3.5-flash",
+    api_key=os.getenv("GEMINI_API_KEY")
+)
 
-    Args:
-        raw_input (str): The raw mathematical result or computation output.
-        user_message (Optional[str], optional): The original context or query from the user. Defaults to "".
-        *args: Additional positional arguments for flexibility across caller implementations.
-        **kwargs: Additional keyword arguments for flexibility across caller implementations.
+def run_writer(user_prompt: str, calc_result: str) -> str:
+    writer_agent = Agent(
+        role="Retro-Futuristic Synthwave Copywriter",
+        goal="Format greetings or mathematical results concisely into retro-futuristic AI responses.",
+        backstory="You are SYNTH_AI, a synthwave assistant. You deliver brief, direct calculation results or friendly greetings.",
+        llm=free_llm,
+        verbose=True,
+        allow_delegation=False
+    )
 
-    Returns:
-        str: The formatted natural language response in Portuguese, or the raw input on failure.
-    """
-    try:
-        llm: LLM = LLM(
-            model="groq/llama-3.3-70b-versatile",
-            api_key=os.getenv("GROQ_API_KEY"),
-            temperature=0.7,
-        )
+    writer_task = Task(
+        description=f"""
+        Process the input data:
+        Calculation/Intent Result: {calc_result}
+        User Prompt: {user_prompt}
 
-        writer_agent: Agent = Agent(
-            role="Writer",
-            goal="Format mathematical responses into natural Portuguese text.",
-            backstory="You are a friendly assistant skilled at presenting numbers clearly and concisely.",
-            llm=llm,
-            verbose=False,
-        )
+        Instructions:
+        - If the calculation result indicates GREETING:
+          Provide a short, cool retro-futuristic welcome message (e.g., "SYSTEM ONLINE :: Welcome user. Ready for mathematical processing.").
+        - If the calculation result is a MATH RESULT:
+          Limit the response strictly to the calculation resolution and final answer. Keep explanations minimal and direct to the numbers.
+        - Do NOT wrap output in markdown code blocks like ```text or ```.
+        - Output plain raw text directly.
+        """,
+        expected_output="A brief synthwave-styled greeting or a direct mathematical result in plain text.",
+        agent=writer_agent
+    )
 
-        task_description: str = (
-            f"Format the following raw mathematical result into a clear, natural response in Portuguese: '{raw_input}'."
-        )
-        if user_message:
-            task_description += f" Original user message context: '{user_message}'."
+    crew = Crew(
+        agents=[writer_agent],
+        tasks=[writer_task]
+    )
 
-        formatting_task: Task = Task(
-            description=task_description,
-            expected_output="A polite, natural sentence containing the final numerical answer.",
-            agent=writer_agent,
-        )
-
-        crew: Crew = Crew(
-            agents=[writer_agent],
-            tasks=[formatting_task],
-            verbose=False,
-        )
-
-        result = crew.kickoff()
-        return result.raw if hasattr(result, "raw") else str(result)
-
-    except Exception:
-        return raw_input
+    result = crew.kickoff()
+    return str(result)
