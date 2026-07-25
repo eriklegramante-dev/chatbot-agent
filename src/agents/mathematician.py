@@ -5,81 +5,55 @@ This module defines the Mathematician Agent using CrewAI, responsible for
 executing precise mathematical computations by dynamically leveraging arithmetic tools.
 """
 
+import os 
 import logging
-import os
-from typing import Optional
 from dotenv import load_dotenv
-from crewai import Agent, Task, Crew, LLM
-from src.tools.tools import add, subtract, multiply, divide
+from crewai import Agent, Task, Crew, Process, LLM
 
 load_dotenv()
 logger = logging.getLogger(__name__)
 
+free_llm = LLM(
+    model="gemini/gemini-3.5-flash",
+    api_key=os.getenv("GEMINI_API_KEY")
+)
 
-def run_mathematician(
-    user_message: str,
-    chat_history: Optional[str] = "",
-    context: Optional[str] = "",
-    *args,
-    **kwargs,
-) -> str:
-    """
-    Executes the Mathematician Agent to evaluate mathematical requests.
 
-    Args:
-        user_message (str): The primary prompt or calculation request from the user.
-        chat_history (Optional[str], optional): Prior conversation turn history. Defaults to "".
-        context (Optional[str], optional): Additional context or follow-up history. Defaults to "".
-        *args: Variable length argument list.
-        **kwargs: Arbitrary keyword arguments (e.g., history, session_history).
+def run_mathematician(user_prompt: str, chat_history: str = "") -> str:
+    mathematician_agent = Agent(
+        role="Senior Mathematician",
+        goal="Solve mathematical expressions accurately, using conversation history for context when required.",
+        backstory="You are a precise mathematical engine capable of tracking sequential calculations across multi-turn conversations.",
+        llm=free_llm,
+        verbose=True,
+        allow_delegation=False
+    )
 
-    Returns:
-        str: The calculated numerical result or an error message if processing fails.
-    """
-    try:
-        extracted_history = (
-            chat_history
-            or context
-            or kwargs.get("history", "")
-            or kwargs.get("session_history", "")
-            or "No prior context."
-        )
+    math_task = Task(
+        description=f"""
+        Analyze the current user prompt in conjunction with the conversation history.
 
-        llm: LLM = LLM(
-            model="groq/llama-3.3-70b-versatile",
-            api_key=os.getenv("GROQ_API_KEY"),
-            temperature=0.0,
-        )
+        Current User Prompt: "{user_prompt}"
+        Chat History Log: "{chat_history}"
 
-        mathematician_agent: Agent = Agent(
-            role="Mathematician",
-            goal="Perform precise mathematical calculations using available tools.",
-            backstory="You are an expert mathematician focused on accuracy and correctness.",
-            tools=[add, subtract, multiply, divide],
-            llm=llm,
-            verbose=False,
-        )
+        Instructions:
+        1. If the input is a GREETING (e.g., 'hello', 'hi', 'olá'):
+           - Return ONLY the tag: GREETING.
+        2. If the user prompt refers to a previous operation or value (e.g., "now subtract 2", "add 5 to that", "subtraia por 2"):
+           - Extract the previous result from the Chat History Log.
+           - Apply the new mathematical operation to that value.
+           - Show the breakdown (e.g., 64 - 2 = 62) and provide the final numeric answer.
+        3. If it is a standalone mathematical expression:
+           - Solve it directly step-by-step.
+        """,
+        expected_output="Either 'GREETING' or the step-by-step mathematical resolution and final answer.",
+        agent=mathematician_agent
+    )
 
-        calculation_task: Task = Task(
-            description=(
-                f"Calculate the following request: '{user_message}'. "
-                f"Previous Conversation Context: '{extracted_history}'"
-            ),
-            expected_output="Only the numerical result or mathematical final output.",
-            agent=mathematician_agent,
-        )
+    crew = Crew(
+        agents=[mathematician_agent],
+        tasks=[math_task]
+    )
 
-        crew: Crew = Crew(
-            agents=[mathematician_agent],
-            tasks=[calculation_task],
-            verbose=False,
-        )
-
-        result = crew.kickoff()
-        output_str = result.raw if hasattr(result, "raw") else str(result)
-        return output_str
-
-    except Exception as error:
-        print(f"\n[ERROR in run_mathematician]: {type(error).__name__} - {error}")
-        logger.error(f"Error in run_mathematician: {str(error)}", exc_info=True)
-        return "Desculpe, ocorreu um erro ao processar sua solicitação matemática."
+    result = crew.kickoff()
+    return str(result)
