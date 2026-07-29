@@ -3,7 +3,7 @@ Pydantic schemas for the Chatbot API endpoints.
 """
 
 from pydantic import BaseModel, Field, field_validator
-
+from typing import Optional
 
 class ChatRequest(BaseModel):
     """
@@ -20,6 +20,7 @@ class ChatRequest(BaseModel):
         description="The prompt or mathematical command sent by the user.",
         min_length=1,
     )
+    chat_history: Optional[str] = ""
 
     @field_validator("message", "session_id")
     @classmethod
