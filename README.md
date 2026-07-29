@@ -1,233 +1,166 @@
-# 🤖 Multi-Agent Sequential Orchestration Chatbot
+# 🤖 SYNTH_MATH // 1984
 
-This project is an **intelligent and resilient chatbot** built with **Streamlit** and **CrewAI**. The application demonstrates structured orchestration of multiple specialized AI agents, the use of Python tools as the single source of truth, and the implementation of contextual memory, guardrails, and automated testing.
+> Plataforma Full Stack de IA com arquitetura modular, agentes inteligentes e infraestrutura conteinerizada.
 
----
+## 🚀 Visão Geral
 
-## 🎯 Objective
+**SYNTH_MATH // 1984** foi desenvolvido como um desafio técnico para validar competências Full Stack e DevOps. O projeto demonstra arquitetura limpa, integração entre Front-end e Back-end, agentes de IA especializados e ambiente totalmente conteinerizado.
 
-Solve the classic problem of language model hallucinations in mathematical operations by ensuring that all calculations are executed through deterministic tools rather than the LLM itself.
+## ✨ Tecnologias
 
----
+### Back-end
+- Python
+- FastAPI
+- Pydantic
 
-## ✨ Features
+### IA
+- CrewAI
+- Groq (Llama 3)
+- Gemini
+- LiteLLM
 
-- Exact mathematical operations (addition, subtraction, multiplication, and division)
-- Multi-agent architecture powered by CrewAI
-- Short-term contextual memory
-- Input guardrails using Regex validation
-- Robust exception handling and validation
-- Structured logging for auditing and debugging
-- Automated testing with Pytest
-- Web interface built with Streamlit
+### Front-end
+- React
+- Next.js
+- Tema Synthwave / 1984
 
----
+### Infraestrutura
+- Docker
+- Docker Compose
+- Redes Docker
+- CORS configurado
 
-## 🏗️ Architecture
+### Testes
+- Pytest
+- Swagger/OpenAPI
+- Testes de agentes
+- Testes de memória
+- Testes de orquestração
+- Testes de validação
 
-```mermaid
-flowchart TD
-    U[User]
-    S[Streamlit Interface]
-    C[CrewAI Orchestrator]
-    M[Math Agent]
-    T[Math Tools]
-    W[Writer Agent]
-
-    U --> S
-    S --> C
-    C --> M
-    M --> T
-    T --> W
-```
-
-### Workflow
-
-1. The user submits a request.
-2. Streamlit performs initial validation.
-3. CrewAI orchestrates the agents.
-4. The Math Agent identifies the required operation.
-5. Mathematical Tools execute the actual calculation.
-6. The Writer Agent converts the result into a user-friendly response.
-7. The response is returned to the user.
-
----
-
-## 📁 Project Structure
+## 🏗 Arquitetura
 
 ```text
-chat-bot-task/
-│
-├── app.py
-├── agents_config.py
-├── tools.py
+React/Next.js
+      │
+      ▼
+ FastAPI REST API
+      │
+      ▼
+ Orchestrator
+ ├── Senior Mathematician
+ └── Retro Writer
+      │
+      ▼
+ Memory Manager
+      │
+      ▼
+ LiteLLM
+ ├── Groq
+ └── Gemini
+```
+
+## 📂 Estrutura
+
+```text
+CHAT-BOT-TASK/
+├── logs/
+│   └── app.log
+├── src/
+│   ├── agents/
+│   │   ├── mathematician.py
+│   │   └── writer.py
+│   ├── config/
+│   │   ├── llm.py
+│   │   └── logger_config.py
+│   ├── memory/
+│   │   └── memory_manager.py
+│   ├── orchestrators/
+│   │   └── orchestrator.py
+│   ├── schemas/
+│   │   └── schemas.py
+│   ├── tools/
+│   │   └── tools.py
+│   └── utils/
+│       └── validation.py
+├── tests/
+├── docker-compose.yml
+├── dockerfile
+├── main.py
+├── pytest.ini
 ├── requirements.txt
-├── app.log
-├── README.md
-│
-└── tests/
-    └── test_tools.py
+└── .env.example
 ```
 
----
+## 🤖 Agentes
 
-## 🛠️ Technologies Used
+### Senior Mathematician
+- Resolve cálculos complexos
+- Mantém contexto do histórico
+- Explica o raciocínio
 
-| Technology | Purpose |
-|------------|----------|
-| Python 3.12 | Main programming language |
-| Streamlit | Web interface |
-| CrewAI | Multi-agent orchestration |
-| Groq | LLM inference |
-| Llama 3.3 70B | Language model |
-| Pytest | Automated testing |
+### Copywriter Multilíngue Retro-Futurista
+- Produção de textos
+- Múltiplos idiomas
+- Estilo Synthwave/1984
 
----
-
-## 🧠 Contextual Memory
-
-Conversation history is stored using `st.session_state.messages`.
-
-Example:
-
-```python
-historico_formatado = ""
-
-for msg in st.session_state.messages[:-1]:
-    author = "User" if msg["role"] == "user" else "Assistant"
-    historico_formatado += f"{author}: {msg['content']}\n"
-```
-
-This enables follow-up interactions such as:
-
-```text
-User: What is 5 + 4?
-Assistant: 9
-
-User: Now multiply it by 2
-Assistant: 18
-```
-
----
-
-## 🔒 Guardrails
-
-### Front-End
-
-Regex validation prevents invalid inputs.
-
-Example:
-
-```text
-5 + potato
-```
-
-### Back-End
-
-- Explicit type conversion
-- Exception handling
-- Prompt restrictions
-- Rejection of operations without valid numeric inputs
-
----
-
-## 🚀 Installation
-
-### 1. Clone the Repository
+## ⚙️ Instalação
 
 ```bash
-git clone https://github.com/eriklegramante-dev/chat-bot-task.git
-cd chat-bot-task
+git clone <repo>
+
+cp .env.example .env
+
+docker compose up --build
 ```
 
-### 2. Create a Virtual Environment
-
-#### Linux/macOS
-
-```bash
-python3 -m venv venv
-source venv/bin/activate
-```
-
-#### Windows
-
-```bash
-python -m venv venv
-venv\Scripts\activate
-```
-
-### 3. Install Dependencies
+ou
 
 ```bash
 pip install -r requirements.txt
+
+uvicorn main:app --reload
 ```
 
-### 4. Configure Environment Variables
-
-Create a `.env` file:
-
-```env
-GROQ_API_KEY=your_api_key_here
-```
-
-### 5. Run the Application
+## 🧪 Testes
 
 ```bash
-streamlit run app.py
+pytest
+pytest -v
+pytest --cov
 ```
 
-The application will be available at:
+Também foram realizados testes funcionais através do Swagger.
 
-```text
-http://localhost:8501
+## 📡 Documentação
+
+Após iniciar:
+
+```
+http://localhost:8000/docs
 ```
 
----
+## 🎯 Diferenciais
 
-## 🧪 Testing
+- Arquitetura refatorada
+- Separação por responsabilidades
+- Validação rigorosa
+- Docker Ready
+- Escalável
+- Fácil integração Front-end/Back-end
+- Logging centralizado
+- Memória conversacional
+- Múltiplas LLMs
 
-Run:
+## 🔮 Próximos passos
 
-```bash
-pytest tests/test_tools.py
-```
+- Streaming
+- Redis
+- Banco vetorial
+- Observabilidade
+- CI/CD
+- Deploy Kubernetes
 
-Expected output:
+## 📄 Licença
 
-```text
-collected 5 items
-
-tests/test_tools.py ..... [100%]
-
-5 passed
-```
-
----
-
-## 📊 Acceptance Criteria
-
-- [x] Chatbot runs successfully with Streamlit
-- [x] Exact mathematical operations
-- [x] Calculations performed exclusively through Tools
-- [x] Multi-agent orchestration with CrewAI
-- [x] Functional contextual memory
-- [x] Guardrails implemented
-- [x] Structured logging
-- [x] Automated testing
-
----
-
-## 🚀 Roadmap
-
-- [ ] Database persistence
-- [ ] Docker support
-- [ ] Long-term memory
-- [ ] RAG integration
-- [ ] Langfuse observability
-- [ ] Additional tool integrations
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License.
+MIT
